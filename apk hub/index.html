@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK Hub — Download Premium Apps</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-primary: #0a0a12; --bg-secondary: #12121e; --bg-card: #1a1a2e;
+            --accent: #6c5ce7; --accent-light: #a29bfe; --accent-glow: rgba(108,92,231,0.3);
+            --green: #00cec9; --orange: #fdcb6e; --red: #ff7675;
+            --text: #ffffff; --text-muted: #8888a0; --border: #2a2a3e;
+        }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary); color: var(--text); min-height: 100vh; line-height: 1.6;
+        }
+        body::before {
+            content: ''; position: fixed; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle at 30% 20%, rgba(108,92,231,0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 80%, rgba(0,206,201,0.05) 0%, transparent 50%);
+            z-index: -1; animation: bgFloat 20s ease-in-out infinite;
+        }
+        @keyframes bgFloat {
+            0%,100% { transform: translate(0,0) rotate(0deg); }
+            33% { transform: translate(2%,-2%) rotate(1deg); }
+            66% { transform: translate(-1%,1%) rotate(-1deg); }
+        }
+        header {
+            background: rgba(18,18,30,0.85); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border); padding: 0 40px; height: 72px;
+            display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100;
+        }
+        .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        .logo-icon {
+            width: 40px; height: 40px; background: linear-gradient(135deg,var(--accent),var(--green));
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 20px; font-weight: 800; color: #fff; box-shadow: 0 4px 15px var(--accent-glow);
+        }
+        .logo-text { font-size: 22px; font-weight: 800; color: var(--text); }
+        .logo-text span { color: var(--accent-light); }
+        .header-actions { display: flex; align-items: center; gap: 12px; }
+        .btn-primary {
+            background: linear-gradient(135deg,var(--accent),#5a4bd1); color: #fff; border: none;
+            padding: 10px 24px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px var(--accent-glow); }
+        .user-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(108,92,231,0.15); border: 1px solid rgba(108,92,231,0.3);
+            color: var(--text); padding: 6px 16px 6px 6px; border-radius: 50px; cursor: pointer;
+            transition: all 0.3s; font-family: inherit; font-size: 14px; font-weight: 600;
+        }
+        .user-btn:hover { background: rgba(108,92,231,0.25); border-color: var(--accent); }
+        .user-btn .avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: linear-gradient(135deg,var(--accent),var(--green));
+            display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff;
+        }
+        .hero { text-align: center; padding: 60px 20px 40px; }
+        .hero h1 {
+            font-size: 48px; font-weight: 800; line-height: 1.15; margin-bottom: 12px;
+            background: linear-gradient(135deg,#fff 40%,var(--accent-light));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .hero p { font-size: 18px; color: var(--text-muted); max-width: 500px; margin: 0 auto 24px; }
+        .container { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 24px; }
+        .apk-card {
+            background: var(--bg-card); border-radius: 20px; overflow: hidden;
+            border: 1px solid var(--border); transition: all 0.4s cubic-bezier(0.175,0.885,0.32,1.275); position: relative;
+        }
+        .apk-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg,var(--accent),var(--green)); opacity: 0; transition: opacity 0.3s;
+        }
+        .apk-card:hover { transform: translateY(-6px); border-color: rgba(108,92,231,0.3); box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 40px var(--accent-glow); }
+        .apk-card:hover::before { opacity: 1; }
+        .apk-card .card-top { padding: 24px 24px 0; display: flex; align-items: center; gap: 18px; }
+        .apk-card .app-icon {
+            width: 72px; height: 72px; border-radius: 18px; display: flex; align-items: center;
+            justify-content: center; font-size: 36px; flex-shrink: 0;
+            background: linear-gradient(135deg,rgba(108,92,231,0.2),rgba(0,206,201,0.1));
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .apk-card .app-info h3 { font-size: 22px; font-weight: 800; margin-bottom: 2px; }
+        .apk-card .app-info .developer { font-size: 14px; color: var(--text-muted); margin-bottom: 6px; }
+        .apk-card .app-info .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+        .apk-card .app-info .tag {
+            font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 50px;
+            background: rgba(255,255,255,0.06); color: var(--text-muted);
+        }
+        .apk-card .app-info .tag.green { background: rgba(0,206,201,0.1); color: var(--green); }
+        .apk-card .app-info .tag.purple { background: rgba(108,92,231,0.1); color: var(--accent-light); }
+        .apk-card .app-info .tag.orange { background: rgba(253,203,110,0.1); color: var(--orange); }
+        .apk-card .card-meta {
+            padding: 16px 24px; display: flex; align-items: center; justify-content: space-around;
+            border-top: 1px solid rgba(255,255,255,0.04); margin-top: 16px;
+        }
+        .apk-card .meta-item { text-align: center; }
+        .apk-card .meta-item .val { font-size: 18px; font-weight: 700; color: var(--text); }
+        .apk-card .meta-item .lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .apk-card .rating { text-align: center; }
+        .apk-card .rating .val { font-size: 18px; font-weight: 700; color: var(--orange); }
+        .apk-card .rating .lbl { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .download-section { padding: 0 24px 24px; }
+        .download-btn {
+            width: 100%; background: linear-gradient(135deg,var(--accent),#5a4bd1); color: #fff;
+            border: none; padding: 16px; border-radius: 12px; font-size: 16px; font-weight: 700;
+            cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .download-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px var(--accent-glow); }
+        .download-btn .sub { font-weight: 400; opacity: 0.7; font-size: 13px; }
+        .file-info { text-align: center; margin-top: 10px; font-size: 13px; color: var(--text-muted); }
+        .file-info span { color: var(--green); font-weight: 600; }
+
+        .modal-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: var(--bg-secondary); border-radius: 20px; padding: 36px;
+            width: 100%; max-width: 420px; border: 1px solid var(--border);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.6); animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal h2 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+        .modal .subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 20px; }
+        .modal input {
+            width: 100%; padding: 14px 16px; margin-bottom: 12px;
+            background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+            border-radius: 10px; color: var(--text); font-size: 14px; font-family: inherit; transition: border-color 0.3s;
+        }
+        .modal input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .modal input::placeholder { color: var(--text-muted); }
+        .modal .modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+        .modal .modal-actions button {
+            flex: 1; padding: 14px; border-radius: 10px; font-size: 15px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; border: none; font-family: inherit;
+        }
+        .modal .modal-actions .submit-btn { background: linear-gradient(135deg,var(--accent),#5a4bd1); color: #fff; }
+        .modal .modal-actions .cancel-btn { background: rgba(255,255,255,0.06); color: var(--text); }
+        .form-error { color: var(--red); font-size: 13px; margin-bottom: 12px; display: none; }
+        .form-error.show { display: block; }
+        .divider {
+            display: flex; align-items: center; gap: 16px; margin: 16px 0; color: var(--text-muted); font-size: 13px;
+        }
+        .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+        .social-btn {
+            width: 100%; padding: 14px; border-radius: 10px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04); color: var(--text); font-family: inherit;
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;
+        }
+        .social-btn:hover { background: rgba(255,255,255,0.08); border-color: var(--text-muted); }
+        .switch-auth { text-align: center; margin-top: 14px; font-size: 14px; color: var(--text-muted); }
+        .switch-auth a { color: var(--accent-light); cursor: pointer; text-decoration: none; font-weight: 600; }
+        .toast {
+            position: fixed; bottom: 24px; right: 24px; background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 12px; padding: 16px 24px;
+            display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            transform: translateX(120%); transition: transform 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            z-index: 2000; max-width: 400px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast .toast-icon { font-size: 24px; }
+        .toast .toast-msg { font-size: 14px; font-weight: 500; }
+        .toast .toast-msg .sub { font-weight: 400; color: var(--text-muted); font-size: 13px; }
+        footer { border-top: 1px solid var(--border); padding: 30px 20px; text-align: center; }
+        footer .copyright { color: var(--text-muted); font-size: 13px; }
+        @media (max-width: 768px) {
+            header { padding: 0 16px; height: 64px; }
+            .logo-text { font-size: 18px; }
+            .hero h1 { font-size: 32px; }
+            .hero p { font-size: 15px; }
+            .app-grid { grid-template-columns: 1fr; }
+            .apk-card .card-top { flex-direction: column; text-align: center; }
+            .apk-card .app-info .tags { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">
+            <div class="logo-icon">A</div>
+            <div class="logo-text"><span>APK</span> Hub</div>
+        </a>
+        <div class="header-actions">
+            <button class="btn-primary" id="authBtn" onclick="showSignInModal()">Sign In</button>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Download Premium Apps</h1>
+        <p>Download the latest APKs for Android. Free, fast, and safe.</p>
+    </section>
+
+    <div class="container">
+        <div class="app-grid" id="appGrid"></div>
+    </div>
+
+    <!-- SIGN IN MODAL -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal">
+            <h2 id="authTitle">Sign In</h2>
+            <p class="subtitle" id="authSubtitle">Sign in to download apps.</p>
+            <div class="form-error" id="authError"></div>
+            <div id="signInForm">
+                <input type="email" id="loginEmail" placeholder="Email address" />
+                <input type="password" id="loginPassword" placeholder="Password" />
+                <div class="modal-actions">
+                    <button class="cancel-btn" onclick="closeModal('authModal')">Cancel</button>
+                    <button class="submit-btn" onclick="handleSignIn()">Sign In</button>
+                </div>
+            </div>
+            <div id="signUpForm" style="display:none;">
+                <input type="text" id="signupName" placeholder="Full name" />
+                <input type="email" id="signupEmail" placeholder="Email address" />
+                <input type="password" id="signupPassword" placeholder="Password" />
+                <div class="modal-actions">
+                    <button class="cancel-btn" onclick="closeModal('authModal')">Cancel</button>
+                    <button class="submit-btn" onclick="handleSignUp()">Create Account</button>
+                </div>
+            </div>
+            <div class="divider">or continue with</div>
+            <button class="social-btn" onclick="socialSignIn('Google')">
+                <span style="font-size:18px;font-weight:700;color:#4285F4;">G</span> Continue with Google
+            </button>
+            <div class="switch-auth" id="switchAuth">
+                Don't have an account? <a onclick="toggleAuthMode()">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span class="toast-icon">&#9989;</span>
+        <div class="toast-msg">Success!<div class="sub">Action completed.</div></div>
+    </div>
+
+    <footer>
+        <div class="copyright">&copy; 2026 APK Hub. All rights reserved.</div>
+    </footer>
+
+    <script>
+        let currentUser = null;
+        let isSignUpMode = false;
+        let registeredUsers = [];
+
+        const apps = [
+            {
+                name: "Minecraft",
+                developer: "Mojang Studios",
+                category: "Game",
+                size: "8.2 MB",
+                rating: 4.8,
+                icon: "&#x26CF;&#xFE0F;",
+                downloads: 89200,
+                version: "v1.20.4",
+                file: "https://drive.google.com/uc?export=download&id=1s9Jvu7JvYxSR_dakf-QncETTr0l_Q698"
+            },
+            {
+                name: "Muzza",
+                developer: "Muzza Studio",
+                category: "Music",
+                size: "8.2 MB",
+                rating: 4.9,
+                icon: "&#x1F3B5;",
+                downloads: 45200,
+                version: "v3.0.14",
+                file: "https://drive.google.com/uc?export=download&id=1s9Jvu7JvYxSR_dakf-QncETTr0l_Q698"
+            },
+            {
+                name: "CapCut",
+                developer: "ByteDance",
+                category: "Photo",
+                size: "12.5 MB",
+                rating: 4.7,
+                icon: "&#x1F3AC;",
+                downloads: 67800,
+                version: "v12.3.0",
+                file: "https://drive.google.com/uc?export=download&id=1uY30P45FDWAkDv3sE-9bPh76tTc9grs9"
+            },
+            {
+                name: "Multi View Browser",
+                developer: "MultiView Inc.",
+                category: "Tool",
+                size: "8.5 MB",
+                rating: 4.5,
+                icon: "&#x1F310;",
+                downloads: 12300,
+                version: "v2.1.0",
+                file: "Multi View Browser.apk"
+            }
+        ];
+
+        function renderApps() {
+            const grid = document.getElementById('appGrid');
+            grid.innerHTML = apps.map((app, i) => `
+                <div class="apk-card">
+                    <div class="card-top">
+                        <div class="app-icon">${app.icon}</div>
+                        <div class="app-info">
+                            <h3>${app.name}</h3>
+                            <div class="developer">${app.developer}</div>
+                            <div class="tags">
+                                <span class="tag purple">${app.category}</span>
+                                <span class="tag green">${app.version}</span>
+                                <span class="tag">Android</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            <div class="val" id="dl-${i}">${formatNumber(app.downloads)}</div>
+                            <div class="lbl">Downloads</div>
+                        </div>
+                        <div class="rating">
+                            <div class="val">&#x2B50; ${app.rating}</div>
+                            <div class="lbl">Rating</div>
+                        </div>
+                        <div class="meta-item">
+                            <div class="val">${app.size}</div>
+                            <div class="lbl">Size</div>
+                        </div>
+                    </div>
+                    <div class="download-section">
+                        <button class="download-btn" onclick="downloadApp(${i})">
+                            &#x1F4E5; Download APK <span class="sub">· ${app.size}</span>
+                        </button>
+                        <div class="file-info">
+                            &#x2705; Safe & verified · <span>${formatNumber(app.downloads)}+</span> downloads
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatNumber(n) {
+            if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+            return n;
+        }
+
+        function downloadApp(index) {
+            if (!currentUser) {
+                showToast('Sign in required', 'Please sign in to download', true);
+                showSignInModal();
+                return;
+            }
+            const app = apps[index];
+            app.downloads++;
+            document.getElementById('dl-' + index).textContent = formatNumber(app.downloads);
+
+            const link = document.createElement('a');
+            link.href = app.file;
+            link.download = app.name + '.apk';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Downloading ' + app.name, formatNumber(app.downloads) + ' total downloads');
+        }
+
+        function showSignInModal() {
+            isSignUpMode = false;
+            document.getElementById('authTitle').textContent = 'Sign In';
+            document.getElementById('authSubtitle').textContent = 'Sign in to download apps.';
+            document.getElementById('signInForm').style.display = 'block';
+            document.getElementById('signUpForm').style.display = 'none';
+            document.getElementById('switchAuth').innerHTML = 'Don\'t have an account? <a onclick="toggleAuthMode()">Sign Up</a>';
+            document.getElementById('authError').classList.remove('show');
+            openModal('authModal');
+        }
+
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            if (isSignUpMode) {
+                document.getElementById('authTitle').textContent = 'Create Account';
+                document.getElementById('authSubtitle').textContent = 'Create an account to download apps.';
+                document.getElementById('signInForm').style.display = 'none';
+                document.getElementById('signUpForm').style.display = 'block';
+                document.getElementById('switchAuth').innerHTML = 'Already have an account? <a onclick="toggleAuthMode()">Sign In</a>';
+            } else {
+                document.getElementById('authTitle').textContent = 'Sign In';
+                document.getElementById('authSubtitle').textContent = 'Sign in to download apps.';
+                document.getElementById('signInForm').style.display = 'block';
+                document.getElementById('signUpForm').style.display = 'none';
+                document.getElementById('switchAuth').innerHTML = 'Don\'t have an account? <a onclick="toggleAuthMode()">Sign Up</a>';
+            }
+            document.getElementById('authError').classList.remove('show');
+        }
+
+        function handleSignUp() {
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+            if (!name || !email || !password) { showAuthError('Fill all fields'); return; }
+            if (password.length < 6) { showAuthError('Password min 6 chars'); return; }
+            if (email.indexOf('@') === -1) { showAuthError('Valid email required'); return; }
+            if (registeredUsers.find(function(u) { return u.email === email; })) { showAuthError('Email already exists'); return; }
+            const user = { name: name, email: email, password: password };
+            registeredUsers.push(user);
+            loginUser(user);
+            closeModal('authModal');
+            showToast('Welcome, ' + name + '!', 'You can now download apps');
+        }
+
+        function handleSignIn() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) { showAuthError('Enter email and password'); return; }
+            const user = registeredUsers.find(function(u) { return u.email === email && u.password === password; });
+            if (user) {
+                loginUser(user); closeModal('authModal');
+                showToast('Welcome back, ' + user.name + '!', 'You can now download apps');
+                return;
+            }
+            if (registeredUsers.find(function(u) { return u.email === email; })) { showAuthError('Wrong password'); return; }
+            const newUser = { name: email.split('@')[0], email: email, password: password };
+            registeredUsers.push(newUser);
+            loginUser(newUser);
+            closeModal('authModal');
+            showToast('Welcome, ' + newUser.name + '!', 'Account created & signed in');
+        }
+
+        function socialSignIn(provider) {
+            const name = provider + ' User';
+            const email = provider.toLowerCase() + '_' + Date.now() + '@' + provider.toLowerCase() + '.com';
+            const user = { name: name, email: email, password: 'social' };
+            registeredUsers.push(user);
+            loginUser(user);
+            closeModal('authModal');
+            showToast('Signed in with ' + provider, 'You can now download apps');
+        }
+
+        function loginUser(user) {
+            currentUser = user;
+            const btn = document.getElementById('authBtn');
+            const initial = user.name.charAt(0).toUpperCase();
+            btn.outerHTML = '<button class="user-btn" onclick="showToast(\'' + user.name + '\',\'Signed in as ' + user.email + '\')"><span class="avatar">' + initial + '</span>' + user.name + '</button>';
+            localStorage.setItem('apkUser', JSON.stringify(user));
+            localStorage.setItem('apkUsers', JSON.stringify(registeredUsers));
+        }
+
+        function showAuthError(msg) {
+            document.getElementById('authError').textContent = msg;
+            document.getElementById('authError').classList.add('show');
+        }
+
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); document.getElementById('authError').classList.remove('show'); }
+
+        document.querySelectorAll('.modal-overlay').forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                if (e.target === this) { this.classList.remove('active'); document.getElementById('authError').classList.remove('show'); }
+            });
+        });
+
+        function showToast(msg, sub, isError) {
+            if (isError === undefined) isError = false;
+            const toast = document.getElementById('toast');
+            toast.querySelector('.toast-icon').textContent = isError ? '\u26A0\uFE0F' : '\u2705';
+            toast.querySelector('.toast-msg').innerHTML = msg + '<div class="sub">' + sub + '</div>';
+            toast.classList.add('show');
+            setTimeout(function() { toast.classList.remove('show'); }, 3500);
+        }
+
+        function restoreSession() {
+            try {
+                const saved = localStorage.getItem('apkUser');
+                const savedUsers = localStorage.getItem('apkUsers');
+                if (savedUsers) registeredUsers = JSON.parse(savedUsers);
+                if (saved) {
+                    const user = JSON.parse(saved);
+                    const found = registeredUsers.find(function(u) { return u.email === user.email; });
+                    if (found) { loginUser(found); return; }
+                }
+            } catch(e) {}
+            if (registeredUsers.length === 0) registeredUsers.push({ name: 'Demo', email: 'demo@apk.com', password: 'demo123' });
+        }
+
+        renderApps();
+        restoreSession();
+    </script>
+</body>
+</html>
